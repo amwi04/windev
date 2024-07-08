@@ -83,3 +83,17 @@ XPARC -> xerox
 ## 2/7/2024
 
 A21 gate is opened to give full protected mode 
+
+## 3/7/2024
+2^(4-6) -> BCD (Binary coded decimal)
+2^6 => 64 -> EBCDIC (Extended Binary coded decimal interchange code)
+2^7 => 128 -> ASCII (American Standard code for information interchange) 
+2^16 => 65,536 -> UNICODE (Unified code)
+
+TCAR will becomes wchar for UNICODE 
+TCAR will char for ascii
+
+Windows have unicode ascii code for every funtion
+
+Examples:
+CreateWindow() ->CreateWindowA() for ASCII ->CreateWindowW() for Unicode Widechar   

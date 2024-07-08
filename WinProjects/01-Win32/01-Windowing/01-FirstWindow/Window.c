@@ -42,28 +42,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 	wndclass.hIconSm		= LoadIcon(NULL, IDI_APPLICATION);	   // handle to icon small
 
 	//Register the above window class
-	RegisterClassEx(&wndclass);
+	RegisterClassEx(&wndclass); // return type ATOM 
 
-	//Create the window in Memory
+	//Create the window in Memory return type handle 32 bit unsigned int
 	hwnd = CreateWindow(
-		szClassName,
-		TEXT("Amod Wani"),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		hInstance,
-		NULL
+		szClassName,			// window class name
+		TEXT("Amod Wani"),		// caption bar text
+		WS_OVERLAPPEDWINDOW,	// MAcro(unsingned unique int) window style overlapped window is made by 6 style WS_OVERLAPPEDWINDOW | WS_SYSMENU | WS_THICKFRAME | WS_Caption | WS_MINIMIZEBOX | WS_MAXIMIZEBOX 
+		CW_USEDEFAULT,			// use default value this is for x value  
+		CW_USEDEFAULT,			// use default value this is for y value
+		CW_USEDEFAULT,			// use default value this is for width in pixels 
+		CW_USEDEFAULT,			// use default value this is for height in pixels 
+		NULL,					// this value is for parent window handle we can use null or HWND_DESKTOP
+		NULL,					// this value is for menu handle null means no menu 
+		hInstance,				// this process who is showing this window handle 
+		NULL					// extra infomation for this window 
 	);
 
 	//Show the window on the desktop
-	ShowWindow(hwnd, iCmdShow);
+	ShowWindow(hwnd, iCmdShow); // Show the window on the desktop second parameter how to show parameters
+								// iCmdShow default value is SW_SHOWNORMAL or SW_MAXIMUM or SW_MINIMUM or SW_HIDE 
 
 	//Update on paint window on the desktop
-	UpdateWindow(hwnd);
+	UpdateWindow(hwnd);        // paint the window
 
 	//Message loop
 	while (GetMessage(&msg, NULL, 0, 0))
