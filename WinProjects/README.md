@@ -97,3 +97,49 @@ Windows have unicode ascii code for every funtion
 
 Examples:
 CreateWindow() ->CreateWindowA() for ASCII ->CreateWindowW() for Unicode Widechar   
+
+
+## 10/7/2024
+
+C:\WinProjects\01-Win32\01-Windowing\01-FirstWindow>cl.exe /c /EHsc Window.c
+Command line option
+/EHsc -> Execption Handler synchronous catch 
+/c -> complile only
+
+C:\windev\WinProjects\01-Win32\01-Windowing\02-Messages>link.exe Window.obj user32.lib gdi32.lib /SUBSYSTEM:WINDOWS
+/SUBSYSTEM:WINDOWS -> look for winmain not main
+
+1. Hardware Messages -Eg-> WM_KEYDOWN
+2. Software Messages -Eg-> WM_DISTROY
+3. 
+
+
+- ### *1st message which comes to our application is WM_CREATE even before window is displayed. its called when createwindow*
+
+- For those message where its directly called bipassing message loop is called send messages
+- Which message goes through message loop is called posted message
+
+- Generally software message are send messages
+- General hardware messages are posted messages
+
+- ### Example
+1. send messages example-> WM_CREATE, WM_DISTROY
+2. posted messages example-> WM_RBUTTONDOWN,WM_KEYDOWN
+
+- ### API calls
+1. SendMessages(HWND,UINT,WPARAM,LPARAM); - return type is LRESULT
+2. PostMessages(HWND,UINT,WPARAM,LPARAM); - return type is bool
+
+- SendMessages are synchronous / Blocking
+- PostMessages are asynchronous / non blocking
+
+- PostQuitMessage is one and only software message which gets posted 
+```
+PostQuitMessage(0);
+PostMessage(hwnd, WM_Quit,0,0);
+
+```
+
+
+
+

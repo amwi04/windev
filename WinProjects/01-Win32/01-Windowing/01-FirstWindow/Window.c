@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 	WNDCLASSEX wndclass;	// WNDCLASSEX # windows class extended struct 
 	HWND	   hwnd;
 	MSG		   msg;			//Message struct
-	TCHAR      szClassName[] = TEXT("MyWindow_Amod");
+	TCHAR      szClassName[] = TEXT("MyWindow_Amod"); // TEXT is text in unicode string
 
 	//code
 	ZeroMemory((void*)&wndclass, sizeof(WNDCLASSEX)); // allocate 0 in the memory
@@ -45,6 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 	RegisterClassEx(&wndclass); // return type ATOM 
 
 	//Create the window in Memory return type handle 32 bit unsigned int
+	// this also calls WM_CREATE
 	hwnd = CreateWindow(
 		szClassName,			// window class name
 		TEXT("Amod Wani"),		// caption bar text
@@ -84,7 +85,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	switch (iMsg)
 	{
 		case WM_DESTROY:
-			PostQuitMessage(0);
+			PostQuitMessage(0);	// this sends 0 to while which exits the code
 			break;
 		default:
 			break;
