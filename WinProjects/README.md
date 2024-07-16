@@ -140,6 +140,16 @@ PostMessage(hwnd, WM_Quit,0,0);
 
 ```
 
+## 15/7/2024
 
+- LOWORD() -> LOW WORD
+- HIWORD() -> HIGH WORD
+
+- wParam (16 bit) -> 15-8 bit high word  <br>
+                  -> 0-8 bit low word
+- lParam (32 bit) -> 31 - 16 bit high word <br>
+                  -> 0-15 bit low word
+
+- lParam gives mouse gives x y location 
 
 

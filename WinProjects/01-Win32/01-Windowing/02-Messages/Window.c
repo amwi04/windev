@@ -80,10 +80,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 //window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+	//var declaration
+	TCHAR str[255];
+	wchar_t ch;
+	unsigned int x,y;
+
 	//code 
 	switch (iMsg)
 	{
-		case WM_CREATE: 
+		case WM_CREATE:
+			wsprintf(str,TEXT("WM_CREATE message recieved")); 
 			MessageBox(
 				NULL, // parent window we can use hwnd
 				TEXT("WM_CREATE msg recivied"), // LPCTSTR (long pointer constant string) window message
@@ -92,14 +98,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			);
 			break;
 		case WM_KEYDOWN:
+			switch(LOWORD(wParam))
+			{
+				case VK_ESCAPE:
+					DestroyWindow(hwnd);
+				break;
+				default:
+				break;
+			}
+			break;
+		case WM_CHAR:
+			ch = wParam;
+			wsprintf(str,TEXT("WM_CHAR message %c"),ch); 
 			MessageBox(
 				NULL, // parent window we can use hwnd
-				TEXT("WM_KEYDOWN pressed"), // LPCTSTR (long pointer constant string) window message
+				str, // LPCTSTR (long pointer constant string) window message
 				TEXT("Messgae tytle"), //LPCTSTR window title
 				MB_OK // button to show in window
 			);
 			break;
 		case WM_RBUTTONDOWN:
+			wsprintf(str,TEXT("WM_RBUTTONDOWN message recieved")); 
 			MessageBox(
 				NULL, // parent window we can use hwnd
 				TEXT("WM_RBUTTONDOWN pressed"), // LPCTSTR (long pointer constant string) window message
@@ -108,9 +127,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			);
 			break;
 		case WM_LBUTTONDOWN:
+			x = LOWORD(lParam);
+			y = HIWORD(lParam);
+			wsprintf(str,TEXT("left mouse button clicked at (%d,%d)"),x,y); 
 			MessageBox(
 				NULL, // parent window we can use hwnd
-				TEXT("WM_LBUTTONDOWN pressed"), // LPCTSTR (long pointer constant string) window message
+				str, // LPCTSTR (long pointer constant string) window message
 				TEXT("Messgae tytle"), //LPCTSTR window title
 				MB_OK // button to show in window
 			);
