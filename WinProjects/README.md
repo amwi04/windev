@@ -152,4 +152,10 @@ PostMessage(hwnd, WM_Quit,0,0);
 
 - lParam gives mouse gives x y location 
 
-
+## 16/7/2024
+- We are using Window.rc file to declare resource
+- AMOD_ICON ICON Icon.ico
+- resourcesID resource file name
+- resource file has to be compiled
+- rc.exe Window.rc
+- which generates .res file which has to be added in link
