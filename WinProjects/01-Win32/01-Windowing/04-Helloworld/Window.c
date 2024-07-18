@@ -69,12 +69,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 //window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+	// Varibale declaration
+	HDC hdc = NULL;
+	static PAINTSTRUCT ps;		// Such variable which are used for other message also make them static
+	static RECT rect;
+	TCHAR str[] = TEXT("Hello, world from Windev 2024");
 	//code 
 	switch (iMsg)
 	{
 		case WM_PAINT:
+			// Get the client area rectange of our window
+			// GetClientRect(hwnd,&rect);	
+			// hdc handle to device context
+			hdc = BeginPaint(hwnd, &ps); // get the painter hdc to do our window
+			SetBkColor(hdc,RGB(0,0,0)); //tell the painter hdc to set background text color to black 
+			SetTextColor(hdc,RGB(0,255,0)); // tell hdc to set text color to green
+			// tell the painter hdc 4 things 
+			// which text to draw, what is the len of text to draw -1 means len of string
+			// in which client area rect draw the text
+			// how should i draw text 
+			DrawText(hdc, str, -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE); 
+			// relase the memory pointer
+			// which was allocated in BeginPaint
+			EndPaint(hwnd, &ps);
+			break;
+		case WM_SIZE:
+			GetClientRect(hwnd,&rect);	
 			break;
 		case WM_CREATE:
+			ZeroMemory((void*)&ps, sizeof(PAINTSTRUCT));
+			ZeroMemory((void*)&rect, sizeof(RECT));
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);	// this sends 0 to while which exits the code
