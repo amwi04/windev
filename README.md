@@ -11,3 +11,6 @@ lectures
 - Windows system programming 19 by walter oney
 - Windows system programming 2000 by baker 
 - MS DOS programming by ray duncan
+
+## Links
+- https://learn.microsoft.com/en-us/windows/win32/gdi/wm-paint
