@@ -1,0 +1,214 @@
+#include <windows.h>
+//#include <mmsystem.h> // play sound api which is included in windows.h
+
+#include "Window.h"
+
+// import libarary here instead of passing it in link.exe command line
+#pragma comment(lib,"winmm.lib") // winmm is the lib required for play sound
+
+//Global callback declaration
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define ELLIPSE_SIZE_X 100
+#define ELLIPSE_SIZE_Y 100
+
+//Entry point function
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLine, int iCmdShow)
+{
+	WNDCLASSEX wndclass;	// WNDCLASSEX # windows class extended struct 
+	HWND	   hwnd;
+	MSG		   msg;			//Message struct
+	TCHAR      szClassName[] = TEXT("MyWindow_Amod"); // TEXT is text in unicode string
+
+	//code
+	ZeroMemory((void*)&wndclass, sizeof(WNDCLASSEX)); // allocate 0 in the memory
+
+	//Initializing Window Class
+	wndclass.cbSize			= sizeof(WNDCLASSEX);				   // cb stands for count of bytes
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;			   // window type STyle
+	wndclass.cbClsExtra	    = 0;								   // count of bytes Class Extra information
+	wndclass.cbWndExtra		= 0;								   // count of bytes Window Extra information
+	wndclass.lpfnWndProc	= WndProc;							   // long pointer Function of window procedure
+	wndclass.lpszClassName	= szClassName;						   // long pointer zero terminated string Class Name
+	wndclass.lpszMenuName	= NULL;								   // long pointer zero terminated string Menu Name
+	wndclass.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH); // handle to brush Background BLACK_BRUSH->gives background black -> GetStockObject returns HGDIOBJ -> GDIOBJ.DILL  
+	wndclass.hInstance		= hInstance;						   // 
+	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);	       // handle to cursor -> LoadCursor(hinstance,Identify of default cursor) #passed null to take default instance if not we have to load .cur file # return typr HCURSOR
+	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));	   // handle to icon -> same as cursor # return type HICON
+	wndclass.hIconSm		= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));	   // handle to icon small
+
+	//Register the above window class
+	RegisterClassEx(&wndclass); // return type ATOM 
+
+	//Create the window in Memory return type handle 32 bit unsigned int
+	// this also calls WM_CREATE
+	hwnd = CreateWindow(
+		szClassName,			// window class name
+		TEXT("Amod Wani"),		// caption bar text
+		WS_OVERLAPPEDWINDOW,	// MAcro(unsingned unique int) window style overlapped window is made by 6 style WS_OVERLAPPEDWINDOW | WS_SYSMENU | WS_THICKFRAME | WS_Caption | WS_MINIMIZEBOX | WS_MAXIMIZEBOX 
+		0,//CW_USEDEFAULT,			// use default value this is for x value  
+		0,//CW_USEDEFAULT,			// use default value this is for y value
+		WINDOW_WIDTH,			// use default value this is for width in pixels 
+		WINDOW_HEIGHT,			// use default value this is for height in pixels 
+		NULL,					// this value is for parent window handle we can use null or HWND_DESKTOP
+		NULL,					// this value is for menu handle null means no menu 
+		hInstance,				// this process who is showing this window handle 
+		NULL					// extra infomation for this window 
+	);
+
+	//Show the window on the desktop
+	ShowWindow(hwnd, iCmdShow); // Show the window on the desktop second parameter how to show parameters
+								// iCmdShow default value is SW_SHOWNORMAL or SW_MAXIMUM or SW_MINIMUM or SW_HIDE 
+
+	//Update on paint window on the desktop
+	UpdateWindow(hwnd);        // paint the window
+
+	//Message loop
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return((int)msg.wParam);
+
+}
+
+//window procedure
+LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	// Varibale declaration
+	HDC hdc = NULL;
+	static PAINTSTRUCT ps;		// Such variable which are used for other message also make them static
+	static RECT rect;
+	// TCHAR str[] = TEXT("Hello, world from Windev 2024");
+	HBRUSH hBrush = NULL;
+	static int left_top_x;
+	static int left_top_y;
+	static int right_bottom_x;
+	static int right_bottom_y;
+	static int xAnimated = 0;
+	static BOOL go_from_top_bottom = TRUE;
+	static int rectleft_top_x;
+	static int rectleft_top_y;
+	static int rectright_bottom_x;
+	static int rectright_bottom_y;
+	static int xrectAnimated = 0;
+	static int yrectAnimated = 0;
+	static int go_from_rt_lt_lb_rb = 0;
+
+
+
+	//code 
+	switch (iMsg)
+	{
+		case WM_PAINT:
+			GetClientRect(hwnd,&rect);	
+			hdc = BeginPaint(hwnd, &ps); // get the painter hdc to do our window
+			
+			hBrush = CreateSolidBrush(RGB(255,0,0)); 
+ 
+			SelectObject(hdc, hBrush);
+			left_top_x = (WINDOW_WIDTH/2) - (ELLIPSE_SIZE_X/2);
+			left_top_y = 0 + xAnimated;
+			right_bottom_x = (WINDOW_WIDTH/2) + (ELLIPSE_SIZE_X/2);
+			right_bottom_y= ELLIPSE_SIZE_Y + xAnimated;
+			Ellipse(hdc,left_top_x,left_top_y,right_bottom_x,right_bottom_y);
+			
+			rectleft_top_x = 0 + xrectAnimated;
+			rectleft_top_y = 0 + yrectAnimated;
+			rectright_bottom_x = ELLIPSE_SIZE_X + xrectAnimated;
+			rectright_bottom_y= ELLIPSE_SIZE_Y + yrectAnimated;
+			
+			Rectangle(hdc,rectleft_top_x,rectleft_top_y,rectright_bottom_x,rectright_bottom_y);
+			if (hBrush != NULL)
+			{
+				DeleteObject(hBrush);
+				hBrush = NULL;
+			}
+			if (hdc != NULL) // or we can write if (hdc)
+			{
+				EndPaint(hwnd, &ps);
+				hdc = NULL;
+			}
+			break;
+		case WM_TIMER:
+			KillTimer(hwnd, TIMER_1);
+			if (go_from_top_bottom == TRUE)
+			{
+				xAnimated = xAnimated + 1;
+				if (right_bottom_y == WINDOW_HEIGHT - 10)
+				{
+					go_from_top_bottom = FALSE;
+				}
+			}
+			else
+			{
+				xAnimated = xAnimated - 1;
+				if (left_top_y == 0)
+				{
+					go_from_top_bottom = TRUE;
+				}
+			}
+			if (go_from_rt_lt_lb_rb == 0)
+			{
+				xrectAnimated = xrectAnimated + 1;
+				if (rectright_bottom_x == WINDOW_WIDTH - 10)
+				{
+					go_from_rt_lt_lb_rb = 1;
+				}
+			}
+			if (go_from_rt_lt_lb_rb == 1)
+			{
+				yrectAnimated = yrectAnimated + 1;
+				if (rectright_bottom_y == WINDOW_HEIGHT - 10)
+				{
+					go_from_rt_lt_lb_rb = 2;
+				}
+			}
+			if (go_from_rt_lt_lb_rb == 2)
+			{
+				xrectAnimated = xrectAnimated - 1;
+				if (rectleft_top_x == 0)
+				{
+					go_from_rt_lt_lb_rb = 3;
+				}
+			}
+			if (go_from_rt_lt_lb_rb == 3)
+			{
+				yrectAnimated = yrectAnimated - 1;
+				if (rectleft_top_y == 0)
+				{
+					go_from_rt_lt_lb_rb = 0;
+				}
+			}
+			InvalidateRect(hwnd, NULL, TRUE); //NULL means everthing we can use only &rect also
+			SetTimer(hwnd, TIMER_1,1,NULL);
+			break;
+		case WM_SIZE:
+			break;
+		case WM_CREATE:
+			ZeroMemory((void*)&ps, sizeof(PAINTSTRUCT));
+			ZeroMemory((void*)&rect, sizeof(RECT));
+			//start music
+			PlaySound(
+                MAKEINTRESOURCE(AMOD_WAVE),
+                GetModuleHandle(NULL),
+                SND_ASYNC | SND_LOOP | SND_RESOURCE
+            );
+			//setting timer TIMER_1
+			SetTimer(hwnd, TIMER_1,1,NULL);
+			break;
+		case WM_DESTROY:
+            // stop playing the music
+            PlaySound(NULL,0,0);
+			PostQuitMessage(0);	// this sends 0 to while which exits the code
+			break;
+		default:
+			break;
+	}
+	// Calling default window Produre
+	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}

@@ -1,0 +1,4 @@
+#include "Window.h"
+
+AMOD_ICON ICON Icon.ico
+AMOD_WAVE WAVE wav_file.wav
