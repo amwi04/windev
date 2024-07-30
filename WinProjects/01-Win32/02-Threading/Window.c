@@ -4,6 +4,10 @@
 //Global callback declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+//Global thread function declarations
+DWORD WINAPI ThreadProc1(LPVOID);
+DWORD WINAPI ThreadProc2(LPVOID);
+
 //Entry point function
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLine, int iCmdShow)
 {
@@ -69,10 +73,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 //window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+	// variable declaration
+	HANDLE hThread1 = NULL;
+	HANDLE hThread2 = NULL;
 	//code 
 	switch (iMsg)
 	{
+		case WM_LBUTTONDOWN:
+			MessageBox(
+				NULL, // parent window we can use hwnd
+				TEXT("clicked"), // LPCTSTR (long pointer constant string) window message
+				TEXT("Messgae tytle"), //LPCTSTR window title
+				MB_OK // button to show in window
+			);
+			break;
+		case WM_CREATE:
+			hThread1 = CreateThread(
+				NULL,								// type-> LPSECURITY_ATTRIBUTES (ponter to security structures) upto WIndows NT it was vaild. its dealng with inheritance and security
+				0,									// type-> DWORD -> Thread stack size (0 means default size)
+				(LPTHREAD_START_ROUTINE)ThreadProc1,// type-> LPTHREAD_START_ROUTINE (register your thread fucntion name)
+				(LPVOID) hwnd,						// type-> LPVOID (parementers which need to br passed to thread fucntion)
+				0,									//type-> DWORD (how to behave 0 means once register run you can also create a macro CREATE_SUSPENDED to run later)
+				NULL								//type-> LPWORD (UNique ID) this is handled by OS
+			);
+			hThread2 = CreateThread(
+				NULL,								// type-> LPSECURITY_ATTRIBUTES (ponter to security structures) upto WIndows NT it was vaild. its dealng with inheritance and security
+				0,									// type-> DWORD -> Thread stack size (0 means default size)
+				(LPTHREAD_START_ROUTINE)ThreadProc2,// type-> LPTHREAD_START_ROUTINE (register your thread fucntion name)
+				(LPVOID) hwnd,						// type-> LPVOID (parementers which need to br passed to thread fucntion)
+				0,									//type-> DWORD (how to behave 0 means once register run you can also create a macro CREATE_SUSPENDED to run later)
+				NULL								//type-> LPWORD (UNique ID) this is handled by OS
+			);
+			break; 
 		case WM_DESTROY:
+			if (hThread2)
+			{
+				CloseHandle(hThread2);
+				hThread2 = NULL;
+			}
+			if (hThread1)
+			{
+				CloseHandle(hThread1);
+				hThread1 = NULL;
+			}
 			PostQuitMessage(0);	// this sends 0 to while which exits the code
 			break;
 		default:
@@ -80,4 +123,58 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	}
 	// Calling default window Produre
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}
+
+// defining thread proc 1
+DWORD WINAPI ThreadProc1(LPVOID Param)
+{
+	// variable
+	HDC hdc = NULL;	
+	ULONG i = 0L;
+	TCHAR str[255]; 
+	
+	// code
+
+	hdc = GetDC((HWND) Param);
+	SetBkColor(hdc,RGB(0,0,0));
+	SetTextColor(hdc,RGB(0,255,0));
+	for (i = 0; i <ULONG_MAX;i++) 
+	{
+		wsprintf(str,TEXT("Incrementing: %lu"),i);
+		TextOut(hdc,5,5,str,wcslen(str));
+	}
+	if (hdc)
+	{
+		ReleaseDC((HWND)Param,hdc);
+		hdc = NULL;
+	}
+	return (0);
+
+}
+
+// deine thread proc 2
+DWORD WINAPI ThreadProc2(LPVOID Param)
+{
+	// variable
+	HDC hdc = NULL;	
+	ULONG i = ULONG_MAX;
+	TCHAR str[255]; 
+	
+	// code
+
+	hdc = GetDC((HWND) Param);
+	SetBkColor(hdc,RGB(0,0,0));
+	SetTextColor(hdc,RGB(255,0,0));
+	for (i=ULONG_MAX; i>=0 ;i--)   // ULONG_MAX is 2^32
+	{
+		wsprintf(str,TEXT("Decrementing: %lu"),i);
+		TextOut(hdc,5,25,str,wcslen(str));
+	}
+	if (hdc)
+	{
+		ReleaseDC((HWND)Param,hdc);
+		hdc = NULL;
+	}
+	return 0;
+
 }
