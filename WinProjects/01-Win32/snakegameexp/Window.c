@@ -127,9 +127,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			{
 				// right_bottom_x = right_bottom_x + SIZE_SNAKE;
 				// left_top_x = left_top_x + SIZE_SNAKE;				
-				snake_body[i][0] = snake_body[i-1][0]+SIZE_SNAKE;
+				snake_body[i][0] = snake_body[i-1][0];
 				snake_body[i][1] = snake_body[i-1][1];
-				snake_body[i][2] = snake_body[i-1][2]+SIZE_SNAKE;
+				snake_body[i][2] = snake_body[i-1][2];
 				snake_body[i][3] = snake_body[i-1][3];
 				
 				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
@@ -197,32 +197,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			KillTimer(hwnd, TIMER_1);
 			if (direction == 0)
 			{
-				x_move = x_move + 1;
-				if (right_bottom_x == WINDOW_WIDTH - 15)
+				x_move = x_move + SIZE_SNAKE;
+				if (right_bottom_x >= WINDOW_WIDTH - 15)
 				{
 					direction = 4;
 				}
 			}
 			if (direction == 1)
 			{
-				y_move = y_move + 1;
-				if (right_bottom_y == WINDOW_HEIGHT - 37)
+				y_move = y_move + SIZE_SNAKE;
+				if (right_bottom_y >= WINDOW_HEIGHT - 40)
 				{
 					direction = 4;
 				}
 			}
 			if (direction == 2)
 			{
-				x_move = x_move - 1;
-				if (left_top_x == 0)
+				x_move = x_move - SIZE_SNAKE;
+				if (left_top_x <= 0)
 				{
 					direction = 4;
 				}
 			}
 			if (direction == 3)
 			{
-				y_move = y_move - 1;
-				if (left_top_y == 0)
+				y_move = y_move - SIZE_SNAKE;
+				if (left_top_y <= 0)
 				{
 					direction = 4;
 				}
@@ -253,7 +253,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
             	);
 			}
 			InvalidateRect(hwnd, NULL, TRUE);
-			SetTimer(hwnd, TIMER_1,1,NULL);
+			SetTimer(hwnd, TIMER_1,100,NULL);
 			break;
 		case WM_SIZE:
 			break;
