@@ -1,6 +1,6 @@
 #include <windows.h>
 //#include <mmsystem.h> // play sound api which is included in windows.h
-
+#include <math.h>
 #include "Window.h"
 
 // import libarary here instead of passing it in link.exe command line
@@ -8,6 +8,9 @@
 
 //Global callback declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+int euclidean_distance(
+	int ,int ,int ,int ,int ,int ,int ,int
+);
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -94,7 +97,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 	static int x_move = 0; 
 	static int y_move = 0;
 	static int restart;
-	static int snake_size = 3;
+	static int snake_size = 1;
+	static int snake_body[WINDOW_HEIGHT*WINDOW_WIDTH/10][4];
+	static int frame = 0;
+	static int left_top_x_food;
+	static int left_top_y_food;
+	static int right_bottom_x_food;
+	static int right_bottom_y_food;
 
 	//code 
 	switch (iMsg)
@@ -105,16 +114,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			
 			hBrush = CreateSolidBrush(RGB(255,0,0)); 
 			SelectObject(hdc, hBrush);
+			snake_body[0][0] = left_top_x;
+			snake_body[0][1] = left_top_y;
+			snake_body[0][2] = right_bottom_x;
+			snake_body[0][3] = right_bottom_y;
 			left_top_x = (WINDOW_WIDTH/2) - (SIZE_SNAKE/2) + x_move;
 			left_top_y = (WINDOW_HEIGHT/2) - (SIZE_SNAKE/2) + y_move;
 			right_bottom_x = (WINDOW_WIDTH/2) + (SIZE_SNAKE/2) + x_move;
 			right_bottom_y= (WINDOW_HEIGHT/2) + (SIZE_SNAKE/2) + y_move;
-			for (int i=0; i<snake_size; i++)
+			Rectangle(hdc,left_top_x,left_top_y,right_bottom_x,right_bottom_y);
+			for (int i=1; i<snake_size; i++)
 			{
-				right_bottom_x = right_bottom_x + SIZE_SNAKE;
-				left_top_x = left_top_x + SIZE_SNAKE;
-				Rectangle(hdc,left_top_x,left_top_y,right_bottom_x,right_bottom_y);
+				// right_bottom_x = right_bottom_x + SIZE_SNAKE;
+				// left_top_x = left_top_x + SIZE_SNAKE;				
+				snake_body[i][0] = snake_body[i-1][0]+SIZE_SNAKE;
+				snake_body[i][1] = snake_body[i-1][1];
+				snake_body[i][2] = snake_body[i-1][2]+SIZE_SNAKE;
+				snake_body[i][3] = snake_body[i-1][3];
+				
+				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
 			}
+			if (
+				euclidean_distance(
+					left_top_x,left_top_y,right_bottom_x,right_bottom_y,
+					left_top_x_food,left_top_y_food,right_bottom_x_food,right_bottom_y_food
+				) < SIZE_SNAKE 
+			)
+			{
+				left_top_x_food = rand() % WINDOW_WIDTH;
+				left_top_y_food = rand() % WINDOW_HEIGHT;
+				right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
+				right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
+				snake_size = snake_size + 1;
+			}
+			hBrush = CreateSolidBrush(RGB(0,255,0)); 
+			SelectObject(hdc, hBrush);
+			Rectangle(hdc,left_top_x_food,left_top_y_food,right_bottom_x_food,right_bottom_y_food);
 			if (hBrush != NULL)
 			{
 				DeleteObject(hBrush);
@@ -171,7 +206,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			if (direction == 1)
 			{
 				y_move = y_move + 1;
-				if (right_bottom_y == WINDOW_HEIGHT - 15)
+				if (right_bottom_y == WINDOW_HEIGHT - 37)
 				{
 					direction = 4;
 				}
@@ -179,7 +214,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			if (direction == 2)
 			{
 				x_move = x_move - 1;
-				if (right_bottom_y == WINDOW_WIDTH - 15)
+				if (left_top_x == 0)
 				{
 					direction = 4;
 				}
@@ -187,7 +222,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			if (direction == 3)
 			{
 				y_move = y_move - 1;
-				if (right_bottom_y == WINDOW_HEIGHT - 15)
+				if (left_top_y == 0)
 				{
 					direction = 4;
 				}
@@ -225,6 +260,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 		case WM_CREATE:
 			ZeroMemory((void*)&ps, sizeof(PAINTSTRUCT));
 			ZeroMemory((void*)&rect, sizeof(RECT));
+			left_top_x_food = rand() % WINDOW_WIDTH;
+			left_top_y_food = rand() % WINDOW_HEIGHT;
+			right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
+			right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
 			//start music
 			PlaySound(
                 MAKEINTRESOURCE(AMOD_WAVE),
@@ -243,4 +282,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 	}
 	// Calling default window Produre
 	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
+}
+
+int euclidean_distance(
+	int left_top_x,int left_top_y,int right_bottom_x,int right_bottom_y,
+	int left_top_x_food,int left_top_y_food,int right_bottom_x_food,int right_bottom_y_food
+)
+{
+	int d = sqrt(pow(left_top_x - left_top_x_food ,2) + pow(left_top_y - left_top_y_food,2)); 
+	int d1 = sqrt(pow(right_bottom_x - right_bottom_x_food ,2) + pow(right_bottom_y - right_bottom_y_food,2)); 
+	if (d > d1) return d1;
+	else return d;
 }
