@@ -152,6 +152,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 				right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
 				right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
 				snake_size = snake_size + 1;
+				// snake_body[snake_size][0] = snake_body[snake_size-1][0]; 
+				// snake_body[snake_size][1] = snake_body[snake_size-1][1];
+				// snake_body[snake_size][2] = snake_body[snake_size-1][2];
+				// snake_body[snake_size][3] = snake_body[snake_size-1][2];
 			}
 			hBrush = CreateSolidBrush(RGB(0,255,0)); 
 			SelectObject(hdc, hBrush);
