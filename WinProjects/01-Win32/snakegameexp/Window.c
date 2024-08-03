@@ -104,14 +104,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 	static int left_top_y_food;
 	static int right_bottom_x_food;
 	static int right_bottom_y_food;
+	TCHAR str[255];
 
 	//code 
 	switch (iMsg)
 	{
 		case WM_PAINT:
 			GetClientRect(hwnd,&rect);	
-			hdc = BeginPaint(hwnd, &ps); // get the painter hdc to do our window
+			hdc = BeginPaint(hwnd, &ps);
 			
+			SetBkColor(hdc,RGB(0,0,0)); 
+			SetTextColor(hdc,RGB(255,255,255));
+			wsprintf(str,TEXT("Score: %d"),snake_size-1);
+			DrawText(hdc, str, -1, &rect, DT_LEFT | DT_SINGLELINE);
+
 			hBrush = CreateSolidBrush(RGB(255,0,0)); 
 			SelectObject(hdc, hBrush);
 			snake_body[0][0] = left_top_x;
@@ -141,8 +147,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 				) < SIZE_SNAKE 
 			)
 			{
-				left_top_x_food = rand() % WINDOW_WIDTH;
-				left_top_y_food = rand() % WINDOW_HEIGHT;
+				left_top_x_food = rand() % WINDOW_WIDTH-10;
+				left_top_y_food = rand() % WINDOW_HEIGHT-10;
 				right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
 				right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
 				snake_size = snake_size + 1;
