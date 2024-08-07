@@ -118,6 +118,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 	static int right_bottom_y_food;
 	TCHAR str[255];
 	TCHAR debug[255];
+	static int eat = 0;
 
 	// log("hello");
 	//code 
@@ -135,20 +136,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 			hBrush = CreateSolidBrush(RGB(255,0,0)); 
 			SelectObject(hdc, hBrush);
 
-			for (int i=1; i<snake_size; i++)
-			{			
-				snake_body[i][0] = snake_body[i-1][0];
-				snake_body[i][1] = snake_body[i-1][1];
-				snake_body[i][2] = snake_body[i-1][2];
-				snake_body[i][3] = snake_body[i-1][3];
-
-				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
-			}
 			snake_body[0][0] = (WINDOW_WIDTH/2) - (SIZE_SNAKE/2) + x_move;
 			snake_body[0][1] = (WINDOW_HEIGHT/2) - (SIZE_SNAKE/2) + y_move;
 			snake_body[0][2] = (WINDOW_WIDTH/2) + (SIZE_SNAKE/2) + x_move;
 			snake_body[0][3] = (WINDOW_HEIGHT/2) + (SIZE_SNAKE/2) + y_move;
 			Rectangle(hdc,snake_body[0][0],snake_body[0][1],snake_body[0][2],snake_body[0][3]);
+			for (int i=1; i<snake_size; i++)
+			{	
+				if (direction == 0 || direction == 2)
+				{
+					snake_body[i][0] = snake_body[0][0] - (SIZE_SNAKE*i);
+					snake_body[i][1] = snake_body[0][1] ;
+					snake_body[i][2] = snake_body[0][2] - (SIZE_SNAKE*i);
+					snake_body[i][3] = snake_body[0][3];
+				}
+				if (direction == 1 || direction == 3)
+				{
+					snake_body[i][0] = snake_body[0][0];
+					snake_body[i][1] = snake_body[0][1] - (SIZE_SNAKE*i) ;
+					snake_body[i][2] = snake_body[0][2];
+					snake_body[i][3] = snake_body[0][3] - (SIZE_SNAKE*i);
+				}
+				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
+			}
 			if (
 				euclidean_distance(
 					snake_body[0][0],snake_body[0][1],snake_body[0][2],snake_body[0][3],
@@ -161,10 +171,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 				right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
 				right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
 				snake_size = snake_size + 1;
-				// snake_body[snake_size][0] = ;
-				// snake_body[snake_size][1] = ;
-				// snake_body[snake_size][2] = ;
-				// snake_body[snake_size][3] = ;
+				snake_body[snake_size][0] = snake_body[snake_size-1][0];
+				snake_body[snake_size][1] = snake_body[snake_size-1][1];
+				snake_body[snake_size][2] = snake_body[snake_size-1][2];
+				snake_body[snake_size][3] = snake_body[snake_size-1][3];
 			}
 			hBrush = CreateSolidBrush(RGB(0,255,0)); 
 			SelectObject(hdc, hBrush);
