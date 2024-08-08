@@ -2,6 +2,7 @@
 #include "Window.h"
 // #include "MyMathOne.h" // header file is not important to run code it from documentation and intelesense
 //Global callback declaration
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //Entry point function
@@ -69,23 +70,61 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 //window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+	HMODULE hDll = NULL;
+
+	typedef int (*MakeCubeFnPointer)(int);
+	MakeCubeFnPointer fnPtr = NULL;
+
 	int num = 5;
-	int sqr = 0;
+	int cube = 0;
 	TCHAR str[255];
+
 	//code 
 	switch (iMsg)
 	{
 		case WM_CREATE:
-			sqr = MakeSquare(num);
-			wsprintf(str,"Square of %d is %d",num,sqr);
+			//step 1: load the desired DLL explicitly
+			hDll = LoadLibrary(TEXT("MyMathTwo.dll"));
+			if (hDll==NULL)
+			{
+				MessageBox(
+					NULL,
+					TEXT("LOAD lib() failed"),
+					TEXT("ERROR"),
+					MB_OK | MB_ICONERROR
+				);
+				DestroyWindow(hwnd);
+			}
+			// Step 2: Find MakeCube fucntion address from the loaded DLL
+			fnPtr = (MakeCubeFnPointer)GetProcAddress(hDll,"MakeCube");
+			if (fnPtr == NULL)
+			{
+				FreeLibrary(hDll);
+				hDll = NULL;
+				MessageBox(
+					NULL,
+					TEXT("Load successed but GetProcAddress is failed"),
+					TEXT("ERROR"),
+					MB_OK | MB_ICONERROR
+				);
+				DestroyWindow(hwnd);
+			}
+			// Step 3: Now call the function pointer fnPtr just as it calling MakeCube
+			cube = fnPtr(num);
+			// Step 4: Display result
+			wsprintf(str,"Cube of %d is %d",num,cube);
 			MessageBox(
 				NULL,
 				str,
-				TEXT("Square"),
+				TEXT("Cube"),
 				MB_OK
 			);
+			if (hDll)
+			{
+				FreeLibrary(hDll);
+				hDll = NULL;
+			}
 			DestroyWindow(hwnd);
-
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);	// this sends 0 to while which exits the code

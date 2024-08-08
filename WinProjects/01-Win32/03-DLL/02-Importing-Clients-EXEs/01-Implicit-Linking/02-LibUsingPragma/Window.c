@@ -85,6 +85,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				TEXT("Square"),
 				MB_OK
 			);
+			DestroyWindow(hwnd);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);	// this sends 0 to while which exits the code
