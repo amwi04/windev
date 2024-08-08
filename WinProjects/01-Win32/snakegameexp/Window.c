@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // import libarary here instead of passing it in link.exe command line
-#pragma comment(lib,"winmm.lib") // winmm is the lib required for play sound
+#pragma comment(lib,"winmm.lib")
 
 //Global callback declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -19,47 +19,32 @@ int euclidean_distance(
 #define SIZE_SNAKE 10
 #define LENGTH_SNAKE 10
 
-
-// void log(char *message)
-// {
-// 	FILE *fp = fopen("log.log", "a");
-//     if (fp != NULL)
-//     {
-//         fputs(message, fp);
-//         fclose(fp);
-//     }
-// }
-
-//Entry point function
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLine, int iCmdShow)
 {
-	WNDCLASSEX wndclass;	// WNDCLASSEX # windows class extended struct 
+	WNDCLASSEX wndclass;	 
 	HWND	   hwnd;
-	MSG		   msg;			//Message struct
-	TCHAR      szClassName[] = TEXT("MyWindow_Amod"); // TEXT is text in unicode string
+	MSG		   msg;			
+	TCHAR      szClassName[] = TEXT("MyWindow_Amod"); 
 
 	//code
-	ZeroMemory((void*)&wndclass, sizeof(WNDCLASSEX)); // allocate 0 in the memory
+	ZeroMemory((void*)&wndclass, sizeof(WNDCLASSEX));
 
 	//Initializing Window Class
-	wndclass.cbSize			= sizeof(WNDCLASSEX);				   // cb stands for count of bytes
-	wndclass.style			= CS_HREDRAW | CS_VREDRAW;			   // window type STyle
-	wndclass.cbClsExtra	    = 0;								   // count of bytes Class Extra information
-	wndclass.cbWndExtra		= 0;								   // count of bytes Window Extra information
-	wndclass.lpfnWndProc	= WndProc;							   // long pointer Function of window procedure
-	wndclass.lpszClassName	= szClassName;						   // long pointer zero terminated string Class Name
-	wndclass.lpszMenuName	= NULL;								   // long pointer zero terminated string Menu Name
-	wndclass.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH); // handle to brush Background BLACK_BRUSH->gives background black -> GetStockObject returns HGDIOBJ -> GDIOBJ.DILL  
-	wndclass.hInstance		= hInstance;						   // 
-	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);	       // handle to cursor -> LoadCursor(hinstance,Identify of default cursor) #passed null to take default instance if not we have to load .cur file # return typr HCURSOR
-	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));	   // handle to icon -> same as cursor # return type HICON
-	wndclass.hIconSm		= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));	   // handle to icon small
+	wndclass.cbSize			= sizeof(WNDCLASSEX);				   
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;			   
+	wndclass.cbClsExtra	    = 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.lpfnWndProc	= WndProc;
+	wndclass.lpszClassName	= szClassName;
+	wndclass.lpszMenuName	= NULL;
+	wndclass.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);  
+	wndclass.hInstance		= hInstance; 
+	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
+	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));
+	wndclass.hIconSm		= LoadIcon(hInstance, MAKEINTRESOURCE(AMOD_ICON));
 
-	//Register the above window class
-	RegisterClassEx(&wndclass); // return type ATOM 
+	RegisterClassEx(&wndclass); 
 
-	//Create the window in Memory return type handle 32 bit unsigned int
-	// this also calls WM_CREATE
 	hwnd = CreateWindow(
 		szClassName,			// window class name
 		TEXT("Amod Wani"),		// caption bar text
@@ -74,14 +59,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR LpszCmdLi
 		NULL					// extra infomation for this window 
 	);
 
-	//Show the window on the desktop
-	ShowWindow(hwnd, iCmdShow); // Show the window on the desktop second parameter how to show parameters
-								// iCmdShow default value is SW_SHOWNORMAL or SW_MAXIMUM or SW_MINIMUM or SW_HIDE 
+	ShowWindow(hwnd, iCmdShow); 
+	UpdateWindow(hwnd);
 
-	//Update on paint window on the desktop
-	UpdateWindow(hwnd);        // paint the window
-
-	//Message loop
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -118,10 +98,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 	static int right_bottom_y_food;
 	TCHAR str[255];
 	TCHAR debug[255];
-	static int eat = 0;
-
-	// log("hello");
-	//code 
+	static int just = 0;
 	switch (iMsg)
 	{
 		case WM_PAINT:
@@ -135,30 +112,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 
 			hBrush = CreateSolidBrush(RGB(255,0,0)); 
 			SelectObject(hdc, hBrush);
-
+			for (int i=1; i<snake_size; i++)
+			{			
+				snake_body[i][0] = snake_body[i-1][0];
+				snake_body[i][1] = snake_body[i-1][1];
+				snake_body[i][2] = snake_body[i-1][2];
+				snake_body[i][3] = snake_body[i-1][3];
+				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
+			}
 			snake_body[0][0] = (WINDOW_WIDTH/2) - (SIZE_SNAKE/2) + x_move;
 			snake_body[0][1] = (WINDOW_HEIGHT/2) - (SIZE_SNAKE/2) + y_move;
 			snake_body[0][2] = (WINDOW_WIDTH/2) + (SIZE_SNAKE/2) + x_move;
 			snake_body[0][3] = (WINDOW_HEIGHT/2) + (SIZE_SNAKE/2) + y_move;
 			Rectangle(hdc,snake_body[0][0],snake_body[0][1],snake_body[0][2],snake_body[0][3]);
-			for (int i=1; i<snake_size; i++)
-			{	
-				if (direction == 0 || direction == 2)
-				{
-					snake_body[i][0] = snake_body[0][0] - (SIZE_SNAKE*i);
-					snake_body[i][1] = snake_body[0][1] ;
-					snake_body[i][2] = snake_body[0][2] - (SIZE_SNAKE*i);
-					snake_body[i][3] = snake_body[0][3];
-				}
-				if (direction == 1 || direction == 3)
-				{
-					snake_body[i][0] = snake_body[0][0];
-					snake_body[i][1] = snake_body[0][1] - (SIZE_SNAKE*i) ;
-					snake_body[i][2] = snake_body[0][2];
-					snake_body[i][3] = snake_body[0][3] - (SIZE_SNAKE*i);
-				}
-				Rectangle(hdc,snake_body[i][0],snake_body[i][1],snake_body[i][2],snake_body[i][3]);
-			}
 			if (
 				euclidean_distance(
 					snake_body[0][0],snake_body[0][1],snake_body[0][2],snake_body[0][3],
@@ -171,10 +137,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) // 
 				right_bottom_x_food = left_top_x_food + SIZE_SNAKE;
 				right_bottom_y_food = left_top_y_food + SIZE_SNAKE;
 				snake_size = snake_size + 1;
-				snake_body[snake_size][0] = snake_body[snake_size-1][0];
-				snake_body[snake_size][1] = snake_body[snake_size-1][1];
-				snake_body[snake_size][2] = snake_body[snake_size-1][2];
-				snake_body[snake_size][3] = snake_body[snake_size-1][3];
 			}
 			hBrush = CreateSolidBrush(RGB(0,255,0)); 
 			SelectObject(hdc, hBrush);
